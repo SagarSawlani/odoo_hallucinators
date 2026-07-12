@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
 
 from db import get_db
+from auth import require_admin, get_current_user
 
 router = APIRouter(
     prefix="/departments",
@@ -36,7 +37,7 @@ class DepartmentHeadUpdate(BaseModel):
 # -----------------------------
 
 @router.post("/")
-def create_department(department: DepartmentCreate):
+def create_department(department: DepartmentCreate, current_user=Depends(require_admin)):
 
     conn = get_db()
     cursor = conn.cursor()
@@ -85,7 +86,7 @@ def create_department(department: DepartmentCreate):
 # -----------------------------
 
 @router.get("/")
-def get_departments():
+def get_departments(current_user=Depends(get_current_user)):
 
     conn = get_db()
     cursor = conn.cursor()
@@ -118,7 +119,7 @@ def get_departments():
 # -----------------------------
 
 @router.get("/{department_id}")
-def get_department(department_id: int):
+def get_department(department_id: int, current_user=Depends(get_current_user)):
 
     conn = get_db()
     cursor = conn.cursor()
@@ -153,7 +154,8 @@ def get_department(department_id: int):
 @router.put("/{department_id}")
 def update_department(
     department_id: int,
-    department: DepartmentUpdate
+    department: DepartmentUpdate,
+    current_user=Depends(require_admin)
 ):
 
     conn = get_db()
@@ -226,7 +228,8 @@ def update_department(
 @router.patch("/{department_id}/head")
 def assign_department_head(
     department_id: int,
-    data: DepartmentHeadUpdate
+    data: DepartmentHeadUpdate,
+    current_user=Depends(require_admin)
 ):
 
     conn = get_db()
@@ -281,7 +284,10 @@ def assign_department_head(
 # -----------------------------
 
 @router.delete("/{department_id}")
-def delete_department(department_id: int):
+def delete_department(
+    department_id: int,
+    current_user=Depends(require_admin)
+):
 
     conn = get_db()
     cursor = conn.cursor()

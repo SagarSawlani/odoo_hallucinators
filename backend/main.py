@@ -62,6 +62,13 @@ app.include_router(transfer_router)
 # Home
 # -----------------------------
 
+from fastapi import Depends
+from auth import get_current_user
+
+@app.get("/me")
+def me(current_user=Depends(get_current_user)):
+    return current_user
+
 @app.get("/")
 def read_root():
     return {

@@ -11,3 +11,4 @@ pypdf
 python-dotenv
 langgraph
 langchain-tavily
+firebase-admin
