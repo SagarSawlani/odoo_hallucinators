@@ -1,6 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi.responses import Response
 from pydantic import BaseModel
 from typing import Optional
+import pandas as pd
+import io
 
 from db import get_db
 
@@ -470,3 +473,230 @@ def search_assets(
     conn.close()
 
     return [dict(row) for row in rows]
+
+# ---------------------------------
+# Get Excel Template
+# ---------------------------------
+
+@router.get("/bulk-upload/template")
+def get_template():
+    columns = [
+        "Asset Name",
+        "Category",
+        "Serial Number",
+        "Acquisition Date (YYYY-MM-DD)",
+        "Acquisition Cost",
+        "Location",
+        "Condition",
+        "Department",
+        "Is Bookable (Yes/No)",
+        "Criticality"
+    ]
+    df = pd.DataFrame(columns=columns)
+    
+    # Add a sample row
+    df.loc[0] = [
+        "Dell XPS 15",
+        "Laptops",
+        "SN-12345",
+        "2023-01-15",
+        "1500.00",
+        "HQ - Floor 2",
+        "Excellent",
+        "Engineering Department",
+        "No",
+        "Medium"
+    ]
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Template')
+        
+        # Adjust column widths
+        worksheet = writer.sheets['Template']
+        for col in worksheet.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            worksheet.column_dimensions[column].width = adjusted_width
+            
+    output.seek(0)
+    
+    return Response(
+        content=output.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=AssetFlow_Bulk_Import_Template.xlsx"}
+    )
+
+# ---------------------------------
+# Bulk Upload Assets
+# ---------------------------------
+
+@router.post("/bulk-upload")
+def bulk_upload(file: UploadFile = File(...)):
+    if not file.filename.endswith('.xlsx'):
+        raise HTTPException(400, "Only .xlsx files are supported")
+        
+    try:
+        contents = file.file.read()
+        df = pd.read_excel(io.BytesIO(contents))
+    except Exception as e:
+        raise HTTPException(400, f"Error reading Excel file: {str(e)}")
+        
+    # Required columns
+    required_cols = [
+        "Asset Name", "Category", "Condition"
+    ]
+    
+    for col in required_cols:
+        if col not in df.columns:
+            raise HTTPException(400, f"Missing required column: {col}")
+            
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # Pre-fetch lookup data
+    cursor.execute("SELECT id, name FROM asset_categories")
+    categories = {row["name"]: row["id"] for row in cursor.fetchall()}
+    
+    cursor.execute("SELECT id, name FROM departments")
+    departments = {row["name"]: row["id"] for row in cursor.fetchall()}
+    
+    cursor.execute("SELECT serial_number FROM assets WHERE serial_number IS NOT NULL")
+    existing_serials = {row["serial_number"] for row in cursor.fetchall()}
+    
+    success_count = 0
+    failed_count = 0
+    errors = []
+    
+    # Iterate rows
+    for index, row in df.iterrows():
+        row_num = index + 2  # +2 because index 0 is row 2 in excel (header is row 1)
+        reason = None
+        
+        try:
+            name = str(row.get("Asset Name", "")).strip()
+            cat_name = str(row.get("Category", "")).strip()
+            serial = str(row.get("Serial Number", "")).strip() if pd.notna(row.get("Serial Number")) else None
+            acq_date = str(row.get("Acquisition Date (YYYY-MM-DD)", "")).strip() if pd.notna(row.get("Acquisition Date (YYYY-MM-DD)")) else None
+            cost = row.get("Acquisition Cost")
+            loc = str(row.get("Location", "")).strip() if pd.notna(row.get("Location")) else None
+            cond = str(row.get("Condition", "")).strip()
+            dept_name = str(row.get("Department", "")).strip() if pd.notna(row.get("Department")) else None
+            bookable_str = str(row.get("Is Bookable (Yes/No)", "No")).strip().lower()
+            crit = str(row.get("Criticality", "")).strip() if pd.notna(row.get("Criticality")) else None
+            
+            if not name or name == "nan":
+                reason = "Asset Name is required"
+                raise ValueError()
+                
+            if not cat_name or cat_name == "nan":
+                reason = "Category is required"
+                raise ValueError()
+                
+            if cat_name not in categories:
+                reason = f"Category '{cat_name}' not found"
+                raise ValueError()
+                
+            cat_id = categories[cat_name]
+            
+            if not cond or cond == "nan":
+                reason = "Condition is required"
+                raise ValueError()
+                
+            valid_conditions = ["Excellent", "Good", "Fair", "Poor"]
+            if cond not in valid_conditions:
+                reason = f"Condition must be one of: {', '.join(valid_conditions)}"
+                raise ValueError()
+                
+            dept_id = None
+            if dept_name and dept_name != "nan":
+                if dept_name not in departments:
+                    reason = f"Department '{dept_name}' not found"
+                    raise ValueError()
+                dept_id = departments[dept_name]
+                
+            if serial and serial != "nan":
+                if serial in existing_serials:
+                    reason = f"Serial number '{serial}' already exists"
+                    raise ValueError()
+                    
+            if pd.notna(cost) and cost != "nan":
+                try:
+                    cost = float(cost)
+                except ValueError:
+                    reason = "Acquisition Cost must be numeric"
+                    raise ValueError()
+            else:
+                cost = None
+                
+            is_bookable = bookable_str in ['yes', 'y', 'true', '1']
+            
+            valid_crit = ["Low", "Medium", "High", "Critical"]
+            if crit and crit != "nan":
+                if crit not in valid_crit:
+                    reason = f"Criticality must be one of: {', '.join(valid_crit)}"
+                    raise ValueError()
+            else:
+                crit = None
+                
+            if acq_date == "nan":
+                acq_date = None
+                
+            if serial == "nan":
+                serial = None
+            if loc == "nan":
+                loc = None
+                
+            # If valid, insert
+            asset_tag = generate_asset_tag(cursor)
+            
+            cursor.execute(
+                '''
+                INSERT INTO assets
+                (
+                    asset_tag, name, category_id, serial_number, acquisition_date,
+                    acquisition_cost, location, condition, current_department_id,
+                    is_bookable, criticality
+                )
+                VALUES
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''',
+                (
+                    asset_tag, name, cat_id, serial, acq_date, cost, loc, cond, dept_id, is_bookable, crit
+                )
+            )
+            
+            # Add serial to set so subsequent rows in same file don't duplicate
+            if serial:
+                existing_serials.add(serial)
+                
+            success_count += 1
+            
+        except ValueError:
+            failed_count += 1
+            errors.append({
+                "row": row_num,
+                "reason": reason or "Invalid data format"
+            })
+        except Exception as e:
+            failed_count += 1
+            errors.append({
+                "row": row_num,
+                "reason": str(e)
+            })
+            
+    conn.commit()
+    conn.close()
+    
+    return {
+        "success_count": success_count,
+        "failed_count": failed_count,
+        "errors": errors
+    }

@@ -81,6 +81,12 @@ export default function AssetDirectoryPage() {
   const [expectedReturnDate, setExpectedReturnDate] = useState("");
   const [allocating, setAllocating] = useState(false);
 
+  // Bulk upload modal
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
+  const [bulkFile, setBulkFile] = useState<File | null>(null);
+  const [bulkUploading, setBulkUploading] = useState(false);
+  const [bulkResult, setBulkResult] = useState<any>(null);
+
   useEffect(() => {
     Promise.all([fetchAssets(), fetchCategories(), fetchEmployees()]);
   }, []);
@@ -166,6 +172,35 @@ export default function AssetDirectoryPage() {
     }
   }
 
+  function handleDownloadTemplate() {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/assets/bulk-upload/template`;
+  }
+
+  async function handleBulkUpload(e: React.FormEvent) {
+    e.preventDefault();
+    if (!bulkFile) return;
+    setBulkUploading(true);
+    setBulkResult(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", bulkFile);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/assets/bulk-upload`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Upload failed");
+      }
+      setBulkResult(data);
+      if (data.success_count > 0) fetchAssets();
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setBulkUploading(false);
+    }
+  }
+
   async function handleDispose(assetId: number) {
     if (!confirm("Mark this asset as Disposed?")) return;
     try {
@@ -197,13 +232,22 @@ export default function AssetDirectoryPage() {
               <h1 className="text-h1 text-on-surface tracking-tight font-semibold">Asset Directory</h1>
               <p className="text-body-md text-on-surface-variant mt-2">Central management for all registered organizational assets.</p>
             </div>
-            <button
-              onClick={() => setShowAdd(true)}
-              className="bg-primary text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 text-label-md font-medium hover:bg-primary/90 active:scale-95 transition-all shadow-md whitespace-nowrap shrink-0"
-            >
-              <span className="material-symbols-outlined text-[20px]">add</span>
-              Register New Asset
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => { setShowBulkUpload(true); setBulkResult(null); setBulkFile(null); }}
+                className="bg-secondary/10 text-secondary border border-secondary/20 px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-label-md font-medium hover:bg-secondary/20 active:scale-95 transition-all shadow-sm whitespace-nowrap shrink-0"
+              >
+                <span className="material-symbols-outlined text-[20px]">upload_file</span>
+                Bulk Import
+              </button>
+              <button
+                onClick={() => setShowAdd(true)}
+                className="bg-primary text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 text-label-md font-medium hover:bg-primary/90 active:scale-95 transition-all shadow-md whitespace-nowrap shrink-0"
+              >
+                <span className="material-symbols-outlined text-[20px]">add</span>
+                Register New Asset
+              </button>
+            </div>
           </div>
 
           {/* Filters */}
@@ -415,6 +459,94 @@ export default function AssetDirectoryPage() {
                   <button type="submit" disabled={allocating} className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-50">{allocating ? "Allocating..." : "Allocate"}</button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Bulk Upload Modal */}
+        {showBulkUpload && (
+          <div className="fixed inset-0 z-[100] bg-black/40 flex items-center justify-center p-4" onClick={() => setShowBulkUpload(false)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-lg font-bold text-on-surface mb-6">Bulk Import Assets</h3>
+              
+              {!bulkResult ? (
+                <>
+                  <div className="bg-surface-container-low p-5 rounded-xl border border-outline-variant/30 mb-6">
+                    <h4 className="font-semibold text-sm mb-2 text-on-surface">Instructions</h4>
+                    <ul className="text-sm text-on-surface-variant list-disc pl-5 space-y-1">
+                      <li>Download the template and fill in your asset data.</li>
+                      <li>Do not modify the column headers.</li>
+                      <li>Required fields: Asset Name, Category, Condition.</li>
+                      <li>Condition must be: Excellent, Good, Fair, or Poor.</li>
+                    </ul>
+                    <button onClick={handleDownloadTemplate} type="button" className="mt-4 flex items-center gap-2 text-primary font-medium text-sm hover:underline">
+                      <span className="material-symbols-outlined text-[18px]">download</span>
+                      Download Template (.xlsx)
+                    </button>
+                  </div>
+                  
+                  <form onSubmit={handleBulkUpload} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-label-md font-semibold text-on-surface/90">Select Excel File</label>
+                      <input 
+                        type="file" 
+                        accept=".xlsx" 
+                        required 
+                        onChange={(e) => setBulkFile(e.target.files?.[0] || null)}
+                        className="w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all border border-outline-variant/40 rounded-xl p-2 bg-surface/50" 
+                      />
+                    </div>
+                    <div className="flex gap-3 pt-4">
+                      <button type="button" onClick={() => setShowBulkUpload(false)} className="flex-1 py-3 rounded-xl border border-outline-variant/30 text-on-surface-variant font-semibold text-sm hover:bg-surface-container transition-all">Cancel</button>
+                      <button type="submit" disabled={bulkUploading || !bulkFile} className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-50 flex justify-center items-center gap-2">
+                        {bulkUploading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>}
+                        {bulkUploading ? "Uploading..." : "Start Import"}
+                      </button>
+                    </div>
+                  </form>
+                </>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex-1 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                      <div className="text-3xl font-bold text-emerald-600 mb-1">{bulkResult.success_count}</div>
+                      <div className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">Imported</div>
+                    </div>
+                    <div className="flex-1 bg-error/10 border border-error/20 rounded-xl p-4 text-center">
+                      <div className="text-3xl font-bold text-error mb-1">{bulkResult.failed_count}</div>
+                      <div className="text-xs font-semibold text-error uppercase tracking-wide">Failed</div>
+                    </div>
+                  </div>
+                  
+                  {bulkResult.errors && bulkResult.errors.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="font-semibold text-sm mb-3 text-on-surface">Error Details</h4>
+                      <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl max-h-[250px] overflow-y-auto">
+                        <table className="w-full text-left text-sm">
+                          <thead className="bg-surface-container-low sticky top-0 border-b border-outline-variant/20">
+                            <tr>
+                              <th className="py-2 px-4 font-semibold text-on-surface-variant w-20">Row</th>
+                              <th className="py-2 px-4 font-semibold text-on-surface-variant">Reason</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-outline-variant/10">
+                            {bulkResult.errors.map((err: any, idx: number) => (
+                              <tr key={idx} className="hover:bg-error/5">
+                                <td className="py-2 px-4 font-medium">{err.row}</td>
+                                <td className="py-2 px-4 text-error">{err.reason}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-end pt-2">
+                    <button type="button" onClick={() => setShowBulkUpload(false)} className="px-6 py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm hover:bg-primary/90 transition-all">Close</button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
