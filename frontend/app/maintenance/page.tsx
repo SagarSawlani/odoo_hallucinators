@@ -216,6 +216,18 @@ export default function MaintenancePage() {
                             <h4 className={`text-sm font-semibold mb-2 ${col.id === "Resolved" ? "text-emerald-950" : "text-on-surface"}`}>
                               {req.issue_description}
                             </h4>
+                            {req.priority_reasons && req.priority_reasons.length > 0 && (
+                              <div className="mb-3 space-y-1 bg-surface-container-low/50 p-2 rounded-lg border border-outline-variant/10">
+                                {req.priority_reasons.map((reason, i) => (
+                                  <div key={i} className="flex items-start gap-1.5 text-[11px] text-on-surface-variant/90 leading-tight">
+                                    <span className={`material-symbols-outlined text-[12px] mt-0.5 ${reason.includes("AI") ? "text-primary" : "opacity-60"}`}>
+                                      {reason.includes("AI") ? "smart_toy" : "info"}
+                                    </span>
+                                    <span>{reason}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                             {req.resolution_notes && (
                               <p className="text-xs text-emerald-700 mb-2">{req.resolution_notes}</p>
                             )}

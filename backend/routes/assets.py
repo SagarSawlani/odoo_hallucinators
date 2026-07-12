@@ -538,8 +538,14 @@ def get_template():
 # Bulk Upload Assets
 # ---------------------------------
 
+from auth import get_current_user
+from fastapi import Depends
+
 @router.post("/bulk-upload")
-def bulk_upload(file: UploadFile = File(...)):
+def bulk_upload(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
     if not file.filename.endswith('.xlsx'):
         raise HTTPException(400, "Only .xlsx files are supported")
         
@@ -691,6 +697,12 @@ def bulk_upload(file: UploadFile = File(...)):
                 "row": row_num,
                 "reason": str(e)
             })
+            
+    if success_count > 0:
+        cursor.execute(
+            "INSERT INTO activity_logs (user_id, action, entity_type, description) VALUES (?, ?, ?, ?)",
+            (current_user["id"], "Bulk Import", "assets", f"Imported {success_count} assets via Excel")
+        )
             
     conn.commit()
     conn.close()

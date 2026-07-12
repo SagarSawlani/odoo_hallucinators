@@ -184,9 +184,11 @@ export default function AssetDirectoryPage() {
     try {
       const formData = new FormData();
       formData.append("file", bulkFile);
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/assets/bulk-upload`, {
         method: "POST",
         body: formData,
+        headers: token ? { "Authorization": `Bearer ${token}` } : {},
       });
       const data = await res.json();
       if (!res.ok) {

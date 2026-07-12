@@ -1,9 +1,11 @@
 "use client";
 
 import { useCurrentUser } from "@/lib/useCurrentUser";
+import { useTheme } from "@/lib/ThemeContext";
 
 export default function TopNav() {
   const { user } = useCurrentUser();
+  const { theme, toggleTheme, mounted } = useTheme();
   
   const displayName = user?.name || "Loading...";
   const displayRole = user?.role || "USER";
@@ -27,6 +29,17 @@ export default function TopNav() {
       </div>
       <div className="flex items-center gap-4 lg:gap-6 shrink-0 ml-4">
         <div className="flex items-center gap-1">
+          {mounted && (
+            <button 
+              onClick={toggleTheme}
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high text-on-surface-variant transition-all"
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {theme === 'light' ? 'dark_mode' : 'light_mode'}
+              </span>
+            </button>
+          )}
           <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high text-on-surface-variant transition-all">
             <span className="material-symbols-outlined text-[20px]">help_outline</span>
           </button>

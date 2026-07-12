@@ -57,7 +57,7 @@ def raise_request(payload: MaintenanceCreate):
         criticality = asset["criticality"] or "Low"
         cost = asset["acquisition_cost"] or 0
 
-        priority, reasons = calculate_priority(criticality, cost, payload.blocks_work)
+        priority, reasons = calculate_priority(criticality, cost, payload.blocks_work, payload.issue_description)
 
         cur = conn.execute(
             """INSERT INTO maintenance_requests
