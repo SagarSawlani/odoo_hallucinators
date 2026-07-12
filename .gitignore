@@ -262,3 +262,7 @@ lerna-debug.log*
 
 # pnpm store
 .pnpm-store/
+
+# Database
+assetflow.db
+*.db
