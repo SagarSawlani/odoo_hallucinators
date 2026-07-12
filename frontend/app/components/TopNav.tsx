@@ -1,4 +1,16 @@
+"use client";
+
+import { useCurrentUser } from "@/lib/useCurrentUser";
+
 export default function TopNav() {
+  const { user } = useCurrentUser();
+  
+  const displayName = user?.name || "Loading...";
+  const displayRole = user?.role || "USER";
+  const initials = user?.name 
+    ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+    : "--";
+
   return (
     <header className="sticky top-0 h-[72px] glass-nav border-b border-outline-variant/20 z-40 flex items-center justify-between px-6 lg:px-10">
       <div className="flex items-center gap-4 flex-1 max-w-2xl min-w-0">
@@ -26,12 +38,12 @@ export default function TopNav() {
         <div className="h-6 w-[1px] bg-outline-variant/30 hidden sm:block"></div>
         <div className="flex items-center gap-3 cursor-pointer group hover:bg-surface-container-low p-1.5 rounded-xl transition-all">
           <div className="text-right hidden sm:block min-w-0">
-            <p className="text-sm font-bold text-on-surface leading-none truncate">Alex Rivera</p>
-            <p className="text-[9px] font-extrabold uppercase tracking-widest text-outline mt-1">Admin</p>
+            <p className="text-sm font-bold text-on-surface leading-none truncate">{displayName}</p>
+            <p className="text-[9px] font-extrabold uppercase tracking-widest text-outline mt-1">{displayRole}</p>
           </div>
           <div className="relative w-9 h-9 rounded-full overflow-hidden shadow-sm ring-2 ring-primary/5 group-hover:ring-primary/30 transition-all shrink-0">
             <div className="w-full h-full bg-primary flex items-center justify-center text-white text-sm font-bold">
-              AR
+              {initials}
             </div>
             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-surface rounded-full"></span>
           </div>

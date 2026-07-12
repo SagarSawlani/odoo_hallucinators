@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,8 +18,18 @@ export default function SignupPage() {
     try {
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       const token = await credential.user.getIdToken();
-      // Only keep firebase logic, do not integrate with backend per requirements
-      console.log(credential.user.uid);
+      
+      // Sync with backend
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/employees/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firebase_uid: credential.user.uid,
+          name: name,
+          email: email
+        })
+      });
+
       localStorage.setItem("token", token);
       alert("Signup Success");
       router.push("/dashboard");
@@ -57,6 +68,23 @@ export default function SignupPage() {
           </div>
 
           <form onSubmit={signup} className="space-y-6">
+            {/* Name Field */}
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-label-md text-on-surface-variant/90 ml-0.5 tracking-wide font-medium">
+                Full Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                placeholder="John Doe"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3.5 bg-white/50 border border-slate-200 rounded-xl text-[16px] text-on-surface focus:ring-4 focus:ring-primary/5 focus:border-primary/50 focus:bg-white input-transition outline-none placeholder:text-slate-400"
+              />
+            </div>
+
             {/* Email Field */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-label-md text-on-surface-variant/90 ml-0.5 tracking-wide font-medium">

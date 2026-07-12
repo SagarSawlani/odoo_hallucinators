@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import TopNav from "../components/TopNav";
 import { apiFetch } from "@/lib/api";
+import { useCurrentUser } from "@/lib/useCurrentUser";
 
 interface Category {
   id: number;
@@ -13,8 +14,19 @@ interface Category {
 }
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("Categories");
-  const tabs = ["Categories", "General", "Security"];
+  const { user } = useCurrentUser();
+  const [activeTab, setActiveTab] = useState("Profile");
+  const tabs = ["Profile", "Categories", "General", "Security"];
+
+  // Profile states
+  const [profileName, setProfileName] = useState("");
+  const [profileSaving, setProfileSaving] = useState(false);
+
+  useEffect(() => {
+    if (user && !profileName) {
+      setProfileName(user.name || "");
+    }
+  }, [user]);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +89,31 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleUpdateProfile(e: React.FormEvent) {
+    e.preventDefault();
+    if (!user) return;
+    setProfileSaving(true);
+    try {
+      await apiFetch(`/employees/${user.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: profileName,
+          email: user.email,
+          phone: null,
+          department_id: null,
+          status: "Active"
+        })
+      });
+      sessionStorage.removeItem("currentUser");
+      alert("Profile updated!");
+      window.location.reload();
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setProfileSaving(false);
+    }
+  }
+
   return (
     <div className="bg-surface text-on-surface flex min-h-screen">
       <Sidebar activePath="/settings" />
@@ -106,6 +143,32 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
+
+            {/* Profile Content */}
+            {activeTab === "Profile" && (
+              <div className="flex-1 p-6 lg:p-8 flex flex-col max-w-2xl">
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold text-on-surface">Personal Profile</h3>
+                  <p className="text-sm text-on-surface-variant mt-1">Update your personal details.</p>
+                </div>
+                
+                <form onSubmit={handleUpdateProfile} className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-label-md font-semibold text-on-surface/90">Full Name</label>
+                    <input required value={profileName} onChange={(e) => setProfileName(e.target.value)} placeholder="e.g. John Doe" className="w-full h-12 px-4 bg-surface/50 border border-outline-variant/40 rounded-xl text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-label-md font-semibold text-on-surface/90">Email Address (Read Only)</label>
+                    <input disabled value={user?.email || ""} className="w-full h-12 px-4 bg-surface-container-low/50 border border-outline-variant/20 rounded-xl text-on-surface-variant opacity-70 cursor-not-allowed outline-none" />
+                  </div>
+                  <div className="pt-4">
+                    <button type="submit" disabled={profileSaving || !profileName} className="px-6 py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-50">
+                      {profileSaving ? "Saving..." : "Save Profile"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
 
             {/* Categories Content */}
             {activeTab === "Categories" && (
@@ -162,7 +225,7 @@ export default function SettingsPage() {
             )}
 
             {/* Other Tabs Stub */}
-            {activeTab !== "Categories" && (
+            {activeTab !== "Categories" && activeTab !== "Profile" && (
               <div className="flex-1 p-6 lg:p-8 flex items-center justify-center">
                 <p className="text-outline text-sm font-medium">{activeTab} settings coming soon...</p>
               </div>
