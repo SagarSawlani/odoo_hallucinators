@@ -266,3 +266,6 @@ lerna-debug.log*
 # Database
 assetflow.db
 *.db
+
+scratch_test.py
+test.py
