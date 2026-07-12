@@ -9,20 +9,17 @@ from routes.category import router as category_router
 from routes.employee import router as employee_router
 from routes.maintenance import router as maintenance_router
 from routes.audit import router as audit_router
-
-# Person 2 Routers
+from routes.dashboard import router as dashboard_router
 from routes.assets import router as assets_router
 from routes.allocation import router as allocation_router
 from routes.transfer import router as transfer_router
+from routes.notifications import router as notifications_router
+from routes.activity_logs import router as activity_logs_router
 
 app = FastAPI(
     title="AssetFlow API",
     version="1.0.0"
 )
-
-# -----------------------------
-# CORS
-# -----------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,9 +36,6 @@ def user_already_exists_handler(request: Request, exc: UserAlreadyExists):
         content={"detail": str(exc)}
     )
 
-# -----------------------------
-# Include Routers
-# -----------------------------
 
 app.include_router(department_router)
 app.include_router(category_router)
@@ -49,6 +43,9 @@ app.include_router(employee_router)
 app.include_router(booking_router)
 app.include_router(maintenance_router)
 app.include_router(audit_router)
+app.include_router(dashboard_router)
+app.include_router(notifications_router)
+app.include_router(activity_logs_router)
 
 # Person 2
 app.include_router(assets_router)

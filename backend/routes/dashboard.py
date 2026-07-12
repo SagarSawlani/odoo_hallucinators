@@ -2,7 +2,7 @@ from fastapi import APIRouter
 import sqlite3
 from db import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 @router.get("/summary")
 def get_dashboard_summary():

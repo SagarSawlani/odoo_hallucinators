@@ -87,6 +87,14 @@ def approve_request(request_id: int, payload: MaintenanceApprove):
         if row["status"] != "Pending":
             raise HTTPException(400, f"Cannot approve a request with status '{row['status']}'")
 
+        # 🔒 ADD THIS GUARD - Check if asset is already UnderMaintenance
+        asset = conn.execute("SELECT status FROM assets WHERE id = ?", (row["asset_id"],)).fetchone()
+        if asset["status"] == "UnderMaintenance":
+            raise HTTPException(
+                409, 
+                f"Asset {row['asset_id']} is already under maintenance. Please resolve the existing maintenance request first."
+            )
+
         conn.execute(
             "UPDATE maintenance_requests SET status = 'Approved', approved_by = ? WHERE id = ?",
             (payload.approved_by, request_id)
