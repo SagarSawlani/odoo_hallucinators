@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AssetFlow | Enterprise Suite</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e7e7f3",
+                        "surface-tint": "#0053db",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "tertiary-container": "#bc4800",
+                        "primary-container": "#2563eb",
+                        "on-tertiary-fixed": "#360f00",
+                        "on-secondary-fixed": "#07006c",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "primary": "#004ac6",
+                        "surface-container": "#ededf9",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcd",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "surface": "#faf8ff",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#faf8ff",
+                        "outline-variant": "#c3c6d7",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "outline": "#737686",
+                        "primary-fixed": "#dbe1ff",
+                        "inverse-primary": "#b4c5ff",
+                        "tertiary": "#943700",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary-container": "#ffede6",
+                        "background": "#f8fafc",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191b23",
+                        "on-surface": "#191b23",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "on-surface-variant": "#434655",
+                        "on-primary-container": "#eeefff",
+                        "surface-container-low": "#f3f3fe",
+                        "inverse-surface": "#2e3039",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#6063ee",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#e1e0ff",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-on-surface": "#f0f0fb",
+                        "surface-variant": "#e1e2ed",
+                        "secondary": "#4648d4",
+                        "surface-container-highest": "#e1e2ed",
+                        "surface-dim": "#d9d9e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.375rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin_mobile": "16px",
+                        "header_height": "72px",
+                        "gutter": "32px",
+                        "base_unit": "4px",
+                        "container_max": "1440px",
+                        "sidebar_width": "280px"
+                    },
+                    "fontFamily": {
+                        "display": ["Inter", "sans-serif"],
+                        "h1": ["Inter", "sans-serif"],
+                        "h2": ["Inter", "sans-serif"],
+                        "h3": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "body-sm": ["Inter", "sans-serif"],
+                        "label-md": ["Inter", "sans-serif"],
+                        "label-sm": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-nav { background: rgba(255, 255, 255, 0.7); backdrop-filter: saturate(180%) blur(20px); }
+        .glass-sidebar { background: rgba(250, 248, 255, 0.8); backdrop-filter: blur(16px); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in { animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+
+        .card-soft-shadow {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .card-hover:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background transition-colors duration-300">
+<!-- SideNavBar -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-[280px] glass-sidebar border-r border-outline-variant/30 flex-col z-50">
+<div class="p-8">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+</div>
+<div>
+<h1 class="font-bold text-lg tracking-tight text-on-surface">AssetFlow</h1>
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">Enterprise Suite</p>
+</div>
+</div>
+<nav class="space-y-1.5">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-primary font-semibold bg-primary/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">domain</span>
+<span class="text-sm">Organization</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">inventory_2</span>
+<span class="text-sm">Assets</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">swap_horiz</span>
+<span class="text-sm">Transfers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">event_available</span>
+<span class="text-sm">Bookings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">build</span>
+<span class="text-sm">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">fact_check</span>
+<span class="text-sm">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">analytics</span>
+<span class="text-sm">Reports</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-8 border-t border-outline-variant/20 space-y-1.5">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">notifications</span>
+<span class="text-sm">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">settings</span>
+<span class="text-sm">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:pl-[280px] min-h-screen">
+<!-- TopNavBar -->
+<header class="sticky top-0 h-18 glass-nav border-b border-outline-variant/20 z-40 flex items-center justify-between px-10">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-lg group">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline/60 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-low/40 border border-outline-variant/20 rounded-xl pl-11 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" placeholder="Search assets, teams, or serial numbers..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-all">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-container-high text-on-surface-variant relative transition-all">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-error rounded-full border border-white"></span>
+</button>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-3 cursor-pointer group hover:bg-surface-container-low p-1.5 rounded-xl transition-all">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold text-on-surface leading-none">Alex Rivera</p>
+<p class="text-[9px] font-extrabold uppercase tracking-widest text-outline mt-1">Admin</p>
+</div>
+<div class="w-9 h-9 rounded-lg border border-outline-variant/30 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQq3p0jZKJFtl47KGJmD8hp2C9h7Ky_ECa5Xh6RrobIzXKTi6bus4bJDfYcpkqo-amRYSjv8iUrahqvov2AOYq2LEswMeTgDFmTWlMkJJOXLp-GOiwFNdN_-vSo9gTDrNhlsh23VUf0uB-1KFFiihEt46yXbRnsPgHGZ7_C9ljJ-cbZbQoWEAYEbSAXYmpD_-39o3IECpBWA_xssSjS2FI0ZKn4WrQKx0m_zOC-ncxBOTFEFIbNB4C"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-10 max-w-container_max mx-auto space-y-12">
+<!-- Page Title & Quick Actions -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 animate-slide-in">
+<div>
+<nav class="flex items-center gap-2 text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-2">
+<span>Ecosystem</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span class="text-outline">Live Dashboard</span>
+</nav>
+<h2 class="text-3xl font-extrabold text-on-surface tracking-tight">Enterprise Overview</h2>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-2.5 rounded-xl text-sm font-semibold hover:shadow-lg hover:shadow-primary/30 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                    Register Asset
+                </button>
+<button class="flex items-center gap-2 bg-white text-on-surface border border-outline-variant/30 px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-surface-container-low transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+                    Manage
+                </button>
+</div>
+</div>
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-5 animate-slide-in stagger-1">
+<!-- Total Assets -->
+<div class="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+<div class="w-8 h-8 bg-primary/5 text-primary rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+</div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Total</p>
+<h4 class="text-2xl font-extrabold text-on-surface">1,284</h4>
+</div>
+<!-- Available -->
+<div class="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+<div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Ready</p>
+<h4 class="text-2xl font-extrabold text-on-surface">432</h4>
+</div>
+<!-- Allocated -->
+<div class="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+<div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[18px]">person_pin_circle</span>
+</div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">In Use</p>
+<h4 class="text-2xl font-extrabold text-on-surface">715</h4>
+</div>
+<!-- Under Maintenance -->
+<div class="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+<div class="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[18px]">build</span>
+</div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Repair</p>
+<h4 class="text-2xl font-extrabold text-on-surface">84</h4>
+</div>
+<!-- Pending Transfers -->
+<div class="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+<div class="w-8 h-8 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+</div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Transit</p>
+<h4 class="text-2xl font-extrabold text-on-surface">12</h4>
+</div>
+<!-- Active Bookings -->
+<div class="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+<div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+</div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Booked</p>
+<h4 class="text-2xl font-extrabold text-on-surface">38</h4>
+</div>
+<!-- Upcoming Returns -->
+<div class="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+<div class="w-8 h-8 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[18px]">keyboard_return</span>
+</div>
+<p class="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Returns</p>
+<h4 class="text-2xl font-extrabold text-on-surface">06</h4>
+</div>
+</div>
+<!-- Bento Grid Main Content -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 animate-slide-in stagger-2">
+<!-- Chart: Asset Utilization -->
+<div class="lg:col-span-8 bg-white p-8 rounded-2xl card-soft-shadow border border-outline-variant/10">
+<div class="flex items-center justify-between mb-10">
+<div>
+<h3 class="text-xl font-bold text-on-surface tracking-tight">Asset Utilization</h3>
+<p class="text-sm text-outline mt-1">Real-time aggregate across global departments</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1.5 text-[11px] font-bold text-primary mr-4">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Live Sync
+                        </span>
+<select class="bg-surface-container-low/50 border border-outline-variant/20 rounded-lg text-xs font-semibold px-4 py-2 focus:ring-2 focus:ring-primary/20 outline-none">
+<option>Last 30 Days</option>
+<option>Last 6 Months</option>
+</select>
+</div>
+</div>
+<div class="h-72 relative">
+<div class="absolute inset-0 flex flex-col justify-between">
+<div class="w-full h-[1px] bg-outline-variant/10"></div>
+<div class="w-full h-[1px] bg-outline-variant/10"></div>
+<div class="w-full h-[1px] bg-outline-variant/10"></div>
+<div class="w-full h-[1px] bg-outline-variant/10"></div>
+<div class="w-full h-[1px] bg-outline-variant/10"></div>
+</div>
+<svg class="w-full h-full overflow-visible" viewbox="0 0 800 288">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#004ac6" stop-opacity="0.15"></stop>
+<stop offset="100%" stop-color="#004ac6" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Smooth Area Path -->
+<path d="M0,220 C100,200 150,210 200,205 C250,200 300,160 400,150 C500,140 600,110 700,95 C750,85 800,90 800,90 L800,288 L0,288 Z" fill="url(#chartGradient)"></path>
+<!-- Smooth Line Path -->
+<path d="M0,220 C100,200 150,210 200,205 C250,200 300,160 400,150 C500,140 600,110 700,95 C750,85 800,90 800,90" fill="none" stroke="#004ac6" stroke-linecap="round" stroke-width="3"></path>
+<circle class="cursor-pointer transition-all hover:r-8" cx="400" cy="150" fill="#004ac6" r="5" stroke="#fff" stroke-width="3"></circle>
+</svg>
+</div>
+<div class="flex justify-between mt-6 px-1">
+<span class="text-[10px] font-bold text-outline/50">SEPT 01</span>
+<span class="text-[10px] font-bold text-outline/50">SEPT 08</span>
+<span class="text-[10px] font-bold text-outline/50 text-primary">SEPT 15 (TODAY)</span>
+<span class="text-[10px] font-bold text-outline/50">SEPT 22</span>
+<span class="text-[10px] font-bold text-outline/50">SEPT 30</span>
+</div>
+</div>
+<!-- Donut Chart: Dept Allocation -->
+<div class="lg:col-span-4 bg-white p-8 rounded-2xl card-soft-shadow border border-outline-variant/10 flex flex-col">
+<h3 class="text-xl font-bold text-on-surface tracking-tight mb-1">Department Share</h3>
+<p class="text-sm text-outline mb-10">Resource split by operational units</p>
+<div class="flex-1 flex flex-col items-center justify-center">
+<div class="relative w-56 h-56 mb-10">
+<svg class="w-full h-full -rotate-90 drop-shadow-sm" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="none" r="16" stroke="#f1f5f9" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="none" r="16" stroke="#004ac6" stroke-dasharray="45 100" stroke-linecap="round" stroke-width="4.5"></circle>
+<circle cx="18" cy="18" fill="none" r="16" stroke="#4648d4" stroke-dasharray="25 100" stroke-dashoffset="-45" stroke-linecap="round" stroke-width="4.5"></circle>
+<circle cx="18" cy="18" fill="none" r="16" stroke="#943700" stroke-dasharray="20 100" stroke-dashoffset="-70" stroke-linecap="round" stroke-width="4.5"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-extrabold text-on-surface">1.2k</span>
+<span class="text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Assets</span>
+</div>
+</div>
+<div class="w-full space-y-3">
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary shadow-sm"></span>
+<span class="font-medium text-on-surface">IT &amp; Ops</span>
+</div>
+<span class="font-bold">45%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary shadow-sm"></span>
+<span class="font-medium text-on-surface">R&amp;D Team</span>
+</div>
+<span class="font-bold">25%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary shadow-sm"></span>
+<span class="font-medium text-on-surface">Logistics</span>
+</div>
+<span class="font-bold">20%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 animate-slide-in stagger-3">
+<!-- Activity Timeline -->
+<div class="lg:col-span-5 bg-white p-8 rounded-2xl card-soft-shadow border border-outline-variant/10">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-xl font-bold text-on-surface tracking-tight">Recent Activity</h3>
+<button class="text-primary font-bold text-xs hover:underline decoration-2 underline-offset-4">History</button>
+</div>
+<div class="space-y-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-outline-variant/20">
+<!-- Activity 1 -->
+<div class="flex gap-6 relative">
+<div class="w-6 h-6 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center z-10 ring-4 ring-white">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</div>
+<div class="flex-1">
+<p class="text-sm text-on-surface leading-relaxed"><span class="font-bold">Maintenance Complete</span> for Server Rack #82-X</p>
+<p class="text-[11px] font-medium text-outline mt-1.5 flex items-center gap-2">
+<span class="material-symbols-outlined text-[12px]">schedule</span> Today, 09:42 AM • Mark J.
+                            </p>
+</div>
+</div>
+<!-- Activity 2 -->
+<div class="flex gap-6 relative">
+<div class="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center z-10 ring-4 ring-white">
+<span class="material-symbols-outlined text-[14px] font-bold">swap_horiz</span>
+</div>
+<div class="flex-1">
+<p class="text-sm text-on-surface leading-relaxed"><span class="font-bold">Transfer Approved</span>: 12x MacBooks to Design</p>
+<p class="text-[11px] font-medium text-outline mt-1.5 flex items-center gap-2">
+<span class="material-symbols-outlined text-[12px]">schedule</span> Yesterday, 04:15 PM • Sarah L.
+                            </p>
+</div>
+</div>
+<!-- Activity 3 -->
+<div class="flex gap-6 relative">
+<div class="w-6 h-6 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center z-10 ring-4 ring-white">
+<span class="material-symbols-outlined text-[14px] font-bold">priority_high</span>
+</div>
+<div class="flex-1">
+<p class="text-sm text-on-surface leading-relaxed"><span class="font-bold">Critical Issue</span>: Cooling Failure in Center B</p>
+<p class="text-[11px] font-medium text-outline mt-1.5 flex items-center gap-2">
+<span class="material-symbols-outlined text-[12px]">sensors</span> 2 days ago • Automated Alert
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Asset Review Table -->
+<div class="lg:col-span-7 bg-white rounded-2xl card-soft-shadow border border-outline-variant/10 overflow-hidden flex flex-col">
+<div class="p-8 border-b border-outline-variant/10 flex items-center justify-between">
+<h3 class="text-xl font-bold text-on-surface tracking-tight">Critical Assets Review</h3>
+<div class="flex gap-1">
+<button class="p-2 rounded-lg hover:bg-surface-container-high text-outline transition-colors"><span class="material-symbols-outlined text-[20px]">filter_list</span></button>
+<button class="p-2 rounded-lg hover:bg-surface-container-high text-outline transition-colors"><span class="material-symbols-outlined text-[20px]">more_horiz</span></button>
+</div>
+</div>
+<div class="overflow-x-auto flex-1">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low/30">
+<tr>
+<th class="px-8 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest">Asset ID</th>
+<th class="px-8 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest">Product</th>
+<th class="px-8 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest">Status</th>
+<th class="px-8 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest">Assigned</th>
+<th class="px-8 py-4 text-right"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-8 py-5 text-sm font-bold text-primary">#AF-77291</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm opacity-60">laptop_mac</span>
+</div>
+<p class="text-sm font-semibold text-on-surface">MBP 16" M3</p>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/10 uppercase">Healthy</span>
+</td>
+<td class="px-8 py-5 text-sm font-medium text-on-surface-variant">James Wilson</td>
+<td class="px-8 py-5 text-right">
+<button class="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-surface-container rounded-lg"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-8 py-5 text-sm font-bold text-primary">#AF-88210</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm opacity-60">router</span>
+</div>
+<p class="text-sm font-semibold text-on-surface">Nexus 9000</p>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 ring-1 ring-amber-600/10 uppercase">In Review</span>
+</td>
+<td class="px-8 py-5 text-sm font-medium text-on-surface-variant">Infra Team</td>
+<td class="px-8 py-5 text-right">
+<button class="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-surface-container rounded-lg"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-8 py-5 text-sm font-bold text-primary">#AF-11002</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm opacity-60">print</span>
+</div>
+<p class="text-sm font-semibold text-on-surface">HP LaserJet</p>
+</div>
+</td>
+<td class="px-8 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 ring-1 ring-rose-600/10 uppercase">Critical</span>
+</td>
+<td class="px-8 py-5 text-sm font-medium text-on-surface-variant">—</td>
+<td class="px-8 py-5 text-right">
+<button class="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-surface-container rounded-lg"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 bg-surface-container-low/20 border-t border-outline-variant/10 flex items-center justify-between">
+<p class="text-[10px] font-bold text-outline/60 uppercase tracking-widest">Showing 3 of 1.2k</p>
+<div class="flex gap-3">
+<button class="px-4 py-1.5 bg-white border border-outline-variant/20 rounded-lg text-xs font-bold shadow-sm opacity-50 cursor-not-allowed">Back</button>
+<button class="px-4 py-1.5 bg-white border border-outline-variant/20 rounded-lg text-xs font-bold shadow-sm hover:bg-surface-container-low transition-colors">Next</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full glass-nav flex justify-around p-3 border-t border-outline-variant/30 z-50">
+<a class="flex flex-col items-center p-2 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[9px] font-bold mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant/60" href="#">
+<span class="material-symbols-outlined text-[24px]">inventory_2</span>
+<span class="text-[9px] font-bold mt-1">Assets</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant/60" href="#">
+<span class="material-symbols-outlined text-[24px]">swap_horiz</span>
+<span class="text-[9px] font-bold mt-1">Move</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant/60" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="text-[9px] font-bold mt-1">Settings</span>
+</a>
+</nav>
+<script>
+    // Micro-interactions and simple state management could go here
+    document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Visual feedback logic
+        });
+    });
+</script>
+</body></html>

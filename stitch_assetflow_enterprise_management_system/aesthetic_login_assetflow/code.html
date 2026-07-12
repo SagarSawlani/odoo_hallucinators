@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | AssetFlow Enterprise Suite</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#f1f5f9",
+                    "surface-tint": "#2563eb",
+                    "primary-fixed-dim": "#94a3b8",
+                    "tertiary-container": "#fef3c7",
+                    "primary-container": "#dbeafe",
+                    "on-tertiary-fixed": "#451a03",
+                    "on-secondary-fixed": "#1e1b4b",
+                    "on-primary-fixed-variant": "#1e3a8a",
+                    "primary": "#2563eb",
+                    "surface-container": "#f8fafc",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#ffedd5",
+                    "on-tertiary-fixed-variant": "#92400e",
+                    "surface": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#ffffff",
+                    "outline-variant": "#e2e8f0",
+                    "tertiary-fixed-dim": "#fcd34d",
+                    "outline": "#94a3b8",
+                    "primary-fixed": "#eff6ff",
+                    "inverse-primary": "#93c5fd",
+                    "tertiary": "#d97706",
+                    "on-secondary-container": "#312e81",
+                    "on-tertiary-container": "#78350f",
+                    "background": "#f8fafc",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#a5b4fc",
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#0f172a",
+                    "on-surface": "#1e293b",
+                    "on-secondary-fixed-variant": "#4338ca",
+                    "on-surface-variant": "#475569",
+                    "on-primary-container": "#1e40af",
+                    "surface-container-low": "#f8fafc",
+                    "inverse-surface": "#1e293b",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#e0e7ff",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#e0e7ff",
+                    "error-container": "#fee2e2",
+                    "error": "#ef4444",
+                    "on-primary-fixed": "#172554",
+                    "inverse-on-surface": "#f1f5f9",
+                    "surface-variant": "#f1f5f9",
+                    "secondary": "#4f46e5",
+                    "surface-container-highest": "#e2e8f0",
+                    "surface-dim": "#f1f5f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.375rem",
+                    "lg": "0.5rem",
+                    "xl": "1rem",
+                    "2xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin_mobile": "16px",
+                    "header_height": "64px",
+                    "gutter": "24px",
+                    "base_unit": "4px",
+                    "container_max": "1440px",
+                    "sidebar_width": "280px"
+            },
+            "fontFamily": {
+                    "h1-mobile": ["Inter"],
+                    "h1": ["Inter"],
+                    "display": ["Inter"],
+                    "h3": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "h2": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "h1-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "h1": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+        overflow-x: hidden;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 
+          0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+          0 10px 15px -3px rgba(0, 0, 0, 0.05),
+          0 20px 25px -5px rgba(0, 0, 0, 0.03);
+      }
+      .btn-glow:hover {
+        box-shadow: 0 0 20px rgba(37, 99, 235, 0.25);
+      }
+      .input-transition {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .mesh-bg {
+        background-image: 
+          radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.08) 0, transparent 40%),
+          radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.08) 0, transparent 40%),
+          radial-gradient(at 50% 50%, rgba(148, 163, 184, 0.03) 0, transparent 60%);
+      }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen mesh-bg selection:bg-primary-container selection:text-primary">
+<!-- Background Decorative Elements -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden">
+<div class="absolute -top-48 -left-48 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px]"></div>
+<div class="absolute -bottom-48 -right-48 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[100px]"></div>
+</div>
+<main class="relative z-10 w-full max-w-[460px] px-margin_mobile py-12">
+<!-- Header/Logo Area -->
+<div class="flex flex-col items-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+<div class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/10 mb-5 group transition-all hover:scale-105 hover:shadow-primary/20 duration-500 ease-out">
+<span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<h1 class="font-h2 text-h2 text-on-background tracking-tight">AssetFlow</h1>
+<p class="font-body-sm text-on-surface-variant mt-1.5 opacity-80">Enterprise Asset Management Suite</p>
+</div>
+<!-- Login Card -->
+<section class="glass-card rounded-2xl p-8 md:p-11 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-150">
+<div class="mb-8">
+<h2 class="font-h3 text-h3 text-on-background tracking-tight">Sign in to your account</h2>
+<p class="font-body-sm text-on-surface-variant mt-2">Enter your credentials to access the dashboard.</p>
+</div>
+<form action="#" class="space-y-6" onsubmit="event.preventDefault();">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant/90 ml-0.5 tracking-wide" for="email">Email address</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline/60 text-[20px] group-focus-within:text-primary transition-colors">mail</span>
+</div>
+<input class="w-full pl-11 pr-4 py-3.5 bg-white/50 border border-slate-200 rounded-xl font-body-md text-on-surface focus:ring-4 focus:ring-primary/5 focus:border-primary/50 focus:bg-white input-transition outline-none placeholder:text-outline/40" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center px-0.5">
+<label class="font-label-md text-on-surface-variant/90 tracking-wide" for="password">Password</label>
+<a class="font-label-sm text-primary font-semibold hover:text-primary-container transition-colors focus:underline outline-none" href="#">Forgot?</a>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline/60 text-[20px] group-focus-within:text-primary transition-colors">lock</span>
+</div>
+<input class="w-full pl-11 pr-12 py-3.5 bg-white/50 border border-slate-200 rounded-xl font-body-md text-on-surface focus:ring-4 focus:ring-primary/5 focus:border-primary/50 focus:bg-white input-transition outline-none placeholder:text-outline/40" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-outline/60 hover:text-on-surface-variant transition-colors" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined text-[20px]" id="pw-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Login Button -->
+<button class="w-full bg-primary text-on-primary py-4 rounded-xl font-label-md flex items-center justify-center gap-2 btn-glow transition-all hover:translate-y-[-1px] active:scale-[0.98] active:translate-y-0 mt-4 shadow-lg shadow-primary/20" type="submit">
+<span>Sign In</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+<!-- Divider -->
+<div class="relative my-9">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-slate-200/60"></div>
+</div>
+<div class="relative flex justify-center text-[11px] tracking-widest font-bold uppercase">
+<span class="bg-white/80 px-4 text-slate-400">new to assetflow</span>
+</div>
+</div>
+<!-- Create Account Button -->
+<button class="w-full bg-slate-50 text-slate-600 border border-slate-200 py-3.5 rounded-xl font-label-md flex items-center justify-center gap-2 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-[0.98]" type="button">
+            Create an account
+        </button>
+</section>
+<!-- Footer Trust Elements -->
+<footer class="mt-10 text-center animate-in fade-in duration-1000 delay-500">
+<div class="flex items-center justify-center gap-5 text-slate-400 mb-5">
+<div class="flex items-center gap-1.5 group cursor-default">
+<span class="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">shield</span>
+<span class="font-label-sm">SAML SSO Support</span>
+</div>
+<div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+<div class="flex items-center gap-1.5 group cursor-default">
+<span class="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">verified_user</span>
+<span class="font-label-sm">Bank-grade Security</span>
+</div>
+</div>
+<p class="font-label-sm text-slate-400/80">
+            © 2024 AssetFlow Inc.
+            <span class="mx-2">•</span>
+<a class="hover:text-slate-600 hover:underline transition-colors" href="#">Privacy Policy</a>
+<span class="mx-2">•</span>
+<a class="hover:text-slate-600 hover:underline transition-colors" href="#">Terms</a>
+</p>
+</footer>
+</main>
+<script>
+    function togglePassword() {
+      const pwInput = document.getElementById('password');
+      const pwIcon = document.getElementById('pw-icon');
+      if (pwInput.type === 'password') {
+        pwInput.type = 'text';
+        pwIcon.innerText = 'visibility_off';
+      } else {
+        pwInput.type = 'password';
+        pwIcon.innerText = 'visibility';
+      }
+    }
+
+    // Micro-interaction for form focus refinement
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        input.closest('.group').parentElement.classList.add('translate-x-1');
+      });
+      input.addEventListener('blur', () => {
+        input.closest('.group').parentElement.classList.remove('translate-x-1');
+      });
+    });
+</script>
+</body></html>

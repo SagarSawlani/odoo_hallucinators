@@ -55,7 +55,7 @@ export default function Sidebar({ activePath = '/dashboard' }: { activePath?: st
           </nav>
         </div>
         <div className="mt-auto p-8 border-t border-outline-variant/20 space-y-1.5">
-          <Link href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group">
+          <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high/50 transition-all duration-200 group">
             <span className="material-symbols-outlined text-[20px] group-hover:text-primary shrink-0">settings</span>
             <span className="text-sm truncate">Settings</span>
           </Link>
@@ -76,8 +76,8 @@ export default function Sidebar({ activePath = '/dashboard' }: { activePath?: st
           <span className="material-symbols-outlined text-[24px]" style={activePath.startsWith('/transfers') ? { fontVariationSettings: "'FILL' 1" } : {}}>swap_horiz</span>
           <span className="text-[9px] font-bold mt-1">Move</span>
         </Link>
-        <Link href="#" className={`flex flex-col items-center p-2 text-on-surface-variant/60`}>
-          <span className="material-symbols-outlined text-[24px]">settings</span>
+        <Link href="/settings" className={`flex flex-col items-center p-2 ${activePath.startsWith('/settings') ? 'text-primary' : 'text-on-surface-variant/60'}`}>
+          <span className="material-symbols-outlined text-[24px]" style={activePath.startsWith('/settings') ? { fontVariationSettings: "'FILL' 1" } : {}}>settings</span>
           <span className="text-[9px] font-bold mt-1">Settings</span>
         </Link>
       </nav>

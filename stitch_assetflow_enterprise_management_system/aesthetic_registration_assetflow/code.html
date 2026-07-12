@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Register Asset - AssetFlow Enterprise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Component Tokens & Config -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#e7e7f3",
+            "surface-tint": "#0053db",
+            "primary-fixed-dim": "#b4c5ff",
+            "tertiary-container": "#bc4800",
+            "primary-container": "#2563eb",
+            "on-tertiary-fixed": "#360f00",
+            "on-secondary-fixed": "#07006c",
+            "on-primary-fixed-variant": "#003ea8",
+            "primary": "#004ac6",
+            "surface-container": "#ededf9",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed": "#ffdbcd",
+            "on-tertiary-fixed-variant": "#7d2d00",
+            "surface": "#faf8ff",
+            "on-error-container": "#93000a",
+            "surface-bright": "#faf8ff",
+            "outline-variant": "#c3c6d7",
+            "tertiary-fixed-dim": "#ffb596",
+            "outline": "#737686",
+            "primary-fixed": "#dbe1ff",
+            "inverse-primary": "#b4c5ff",
+            "tertiary": "#943700",
+            "on-secondary-container": "#fffbff",
+            "on-tertiary-container": "#ffede6",
+            "background": "#faf8ff",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#c0c1ff",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#191b23",
+            "on-surface": "#191b23",
+            "on-secondary-fixed-variant": "#2f2ebe",
+            "on-surface-variant": "#434655",
+            "on-primary-container": "#eeefff",
+            "surface-container-low": "#f3f3fe",
+            "inverse-surface": "#2e3039",
+            "on-tertiary": "#ffffff",
+            "secondary-container": "#6063ee",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#e1e0ff",
+            "error-container": "#ffdad6",
+            "error": "#ba1a1a",
+            "on-primary-fixed": "#00174b",
+            "inverse-on-surface": "#f0f0fb",
+            "surface-variant": "#e1e2ed",
+            "secondary": "#4648d4",
+            "surface-container-highest": "#e1e2ed",
+            "surface-dim": "#d9d9e5"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "1rem",
+            "2xl": "1.5rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin_mobile": "16px",
+            "header_height": "64px",
+            "gutter": "24px",
+            "base_unit": "4px",
+            "container_max": "1440px",
+            "sidebar_width": "280px"
+          },
+          "fontFamily": {
+            "body-md": ["Inter"],
+            "label-md": ["Inter"],
+            "h2": ["Inter"],
+            "h3": ["Inter"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+    }
+    .glass-nav {
+      background: rgba(250, 248, 255, 0.8);
+      backdrop-filter: blur(12px);
+    }
+    .step-active { color: var(--tw-color-primary); }
+    .step-line { height: 1px; flex-grow: 1; background: #e1e2ed; }
+    .step-line-active { height: 2px; background: #004ac6; }
+    
+    /* Animation for step transitions */
+    .step-content { display: none; }
+    .step-content.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-input-refined {
+      @apply border-outline-variant/60 focus:border-primary/40 focus:ring-4 focus:ring-primary/10 placeholder:text-on-surface-variant/40 transition-all duration-200;
+    }
+
+    .glass-toast {
+      background: rgba(46, 48, 57, 0.9);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopNavBar (Shell) -->
+<header class="docked sticky top-0 w-full h-16 glass-nav border-b border-outline-variant/30 z-50">
+<div class="flex items-center justify-between px-gutter w-full max-w-container_max mx-auto h-full">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors" onclick="window.history.back()">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+<span class="font-h3 text-h3 font-bold text-primary tracking-tight">AssetFlow</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-label-sm font-label-md text-on-surface-variant hidden md:block opacity-70">Draft: New Asset Registration</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold ring-2 ring-surface">JD</div>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-margin_mobile md:px-gutter py-16">
+<!-- Stepper Header -->
+<div class="mb-16">
+<div class="flex items-center justify-between relative max-w-2xl mx-auto">
+<!-- Step 1 -->
+<div class="flex flex-col items-center z-10 step-item" data-step="1">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center mb-3 shadow-md shadow-primary/20 font-bold transition-all duration-300 text-sm" id="step-icon-1">1</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-primary">Info</span>
+</div>
+<div class="step-line mx-4" id="line-1"></div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center z-10 step-item" data-step="2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-3 transition-all duration-300 text-sm" id="step-icon-2">2</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/60">Category</span>
+</div>
+<div class="step-line mx-4" id="line-2"></div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center z-10 step-item" data-step="3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-3 transition-all duration-300 text-sm" id="step-icon-3">3</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/60">Purchase</span>
+</div>
+<div class="step-line mx-4" id="line-3"></div>
+<!-- Step 4 -->
+<div class="flex flex-col items-center z-10 step-item" data-step="4">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-3 transition-all duration-300 text-sm" id="step-icon-4">4</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/60">Location</span>
+</div>
+<div class="step-line mx-4" id="line-4"></div>
+<!-- Step 5 -->
+<div class="flex flex-col items-center z-10 step-item" data-step="5">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-3 transition-all duration-300 text-sm" id="step-icon-5">5</div>
+<span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/60">Media</span>
+</div>
+</div>
+</div>
+<!-- Form Container -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-10 md:p-12 min-h-[540px] flex flex-col">
+<form class="flex-grow" id="registerAssetForm">
+<!-- Step 1 Content: Basic Info -->
+<div class="step-content active" id="step-content-1">
+<div class="mb-10">
+<h1 class="font-h2 text-h2 text-on-surface mb-3 tracking-tight">Basic Asset Information</h1>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed opacity-80">Start by identifying the core details of your new organizational asset to begin tracking.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Asset Name <span class="text-error">*</span></label>
+<input class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30" placeholder="e.g. MacBook Pro 16-inch" type="text"/>
+</div>
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Asset Tag / Serial Number <span class="text-error">*</span></label>
+<input class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30" placeholder="AF-2024-001" type="text"/>
+</div>
+<div class="flex flex-col gap-2.5 md:col-span-2">
+<label class="text-label-md font-semibold text-on-surface/80">Description</label>
+<textarea class="w-full p-4 rounded-xl border form-input-refined bg-surface/30" placeholder="Enter a brief overview of the asset's purpose or condition..." rows="4"></textarea>
+</div>
+</div>
+</div>
+<!-- Step 2 Content: Category & Department -->
+<div class="step-content" id="step-content-2">
+<div class="mb-10">
+<h1 class="font-h2 text-h2 text-on-surface mb-3 tracking-tight">Classification</h1>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed opacity-80">Define where this asset belongs within your organizational hierarchy.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Asset Category</label>
+<select class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30">
+<option>Hardware &amp; IT</option>
+<option>Furniture</option>
+<option>Vehicles</option>
+<option>Software Licenses</option>
+<option>Machinery</option>
+</select>
+</div>
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Department Assignment</label>
+<select class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30">
+<option>Product &amp; Engineering</option>
+<option>Marketing</option>
+<option>Human Resources</option>
+<option>Finance</option>
+<option>Operations</option>
+</select>
+</div>
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Criticality Level</label>
+<div class="flex gap-6 mt-2">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary/20" name="criticality" type="radio"/>
+<span class="text-body-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Low</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant focus:ring-primary/20" name="criticality" type="radio"/>
+<span class="text-body-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Medium</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary/20" name="criticality" type="radio"/>
+<span class="text-body-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">High</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 3 Content: Purchase Info -->
+<div class="step-content" id="step-content-3">
+<div class="mb-10">
+<h1 class="font-h2 text-h2 text-on-surface mb-3 tracking-tight">Procurement Details</h1>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed opacity-80">Track the financial investment and sourcing for this asset.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Purchase Date</label>
+<input class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30" type="date"/>
+</div>
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Purchase Cost (USD)</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">$</span>
+<input class="w-full h-12 pl-10 pr-4 rounded-xl border form-input-refined bg-surface/30" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div class="flex flex-col gap-2.5 md:col-span-2">
+<label class="text-label-md font-semibold text-on-surface/80">Vendor / Supplier</label>
+<input class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30" placeholder="e.g. Apple Enterprise, Dell Inc." type="text"/>
+</div>
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Warranty Expiry</label>
+<input class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30" type="date"/>
+</div>
+</div>
+</div>
+<!-- Step 4 Content: Location -->
+<div class="step-content" id="step-content-4">
+<div class="mb-10">
+<h1 class="font-h2 text-h2 text-on-surface mb-3 tracking-tight">Location &amp; Deployment</h1>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed opacity-80">Specify the physical or digital location where the asset is currently deployed.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Primary Site</label>
+<select class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30">
+<option>Headquarters - NYC</option>
+<option>West Coast Hub - SF</option>
+<option>Remote / Employee Home</option>
+<option>Cloud Infrastructure</option>
+</select>
+</div>
+<div class="flex flex-col gap-2.5">
+<label class="text-label-md font-semibold text-on-surface/80">Specific Floor / Room</label>
+<input class="w-full h-12 px-4 rounded-xl border form-input-refined bg-surface/30" placeholder="Floor 4, Suite 402" type="text"/>
+</div>
+<div class="md:col-span-2">
+<div class="w-full h-56 rounded-2xl border border-outline-variant/40 bg-surface overflow-hidden relative group shadow-inner">
+<div class="absolute inset-0 bg-cover bg-center" data-location="New York City" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBkFYDDz522wg7Gp3Zzop8bUus-yr2WsW8DQD_diwCUBi6rcmkr6_OXcB6lo938rSZEVs4vTCfECf4qQEDV7hp_2QIgT9MI4reYcnKSwGMS-iLZ4mWPVyDlO-i8ho7pfJ4XDg7QoV8G2cuxnSKr7NLg094niTyXREjOPvxcu3j8lsGcgNtE1-kNeYq13kL8MAeQTnAevDR-daJ17jCqIS75xfxz9jOtN6AEL3Emq-61tPL-cou_nmdv')"></div>
+<div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors pointer-events-none"></div>
+<div class="absolute bottom-4 left-4 bg-surface-container-lowest/95 backdrop-blur-md px-4 py-2.5 rounded-xl text-body-sm font-semibold border border-outline-variant/30 shadow-lg">
+                  Interactive Map View Locked
+                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 5 Content: Documents -->
+<div class="step-content" id="step-content-5">
+<div class="mb-10">
+<h1 class="font-h2 text-h2 text-on-surface mb-3 tracking-tight">Documentation &amp; Media</h1>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed opacity-80">Upload supporting files such as invoices, manuals, or physical photos of the asset.</p>
+</div>
+<div class="space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Upload Item -->
+<div class="p-8 rounded-2xl border-2 border-dashed border-outline-variant/40 hover:border-primary/40 hover:bg-primary/[0.02] transition-all cursor-pointer flex flex-col items-center justify-center gap-4 group">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">upload_file</span>
+</div>
+<div class="text-center">
+<p class="text-label-md font-bold text-on-surface">Upload Warranty/Manual</p>
+<p class="text-body-sm text-on-surface-variant/70 mt-1">PDF, DOCX up to 10MB</p>
+</div>
+</div>
+<!-- Upload Item -->
+<div class="p-8 rounded-2xl border-2 border-dashed border-outline-variant/40 hover:border-primary/40 hover:bg-primary/[0.02] transition-all cursor-pointer flex flex-col items-center justify-center gap-4 group">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">add_a_photo</span>
+</div>
+<div class="text-center">
+<p class="text-label-md font-bold text-on-surface">Asset Images</p>
+<p class="text-body-sm text-on-surface-variant/70 mt-1">JPG, PNG up to 5MB</p>
+</div>
+</div>
+</div>
+<!-- List of uploaded files (Mockup) -->
+<div class="mt-8 border border-outline-variant/30 rounded-2xl overflow-hidden bg-surface-container-low/30">
+<div class="px-6 py-4 bg-surface-container-low border-b border-outline-variant/30 text-[11px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
+                Queued Files (0)
+              </div>
+<div class="p-10 text-center text-on-surface-variant/60 text-body-sm italic">
+                No files selected. Drag and drop files above to attach them to this asset.
+              </div>
+</div>
+</div>
+</div>
+</form>
+<!-- Form Actions -->
+<div class="mt-12 pt-10 border-t border-outline-variant/20 flex items-center justify-between">
+<button class="flex items-center gap-2.5 px-6 h-12 rounded-xl border border-outline-variant/40 text-on-surface font-semibold text-label-md hover:bg-surface-container-high hover:border-outline-variant transition-all opacity-50 cursor-not-allowed" disabled="" id="prevBtn">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+          Back
+        </button>
+<div class="flex items-center gap-6">
+<button class="text-on-surface-variant/60 font-semibold text-label-md hover:text-on-surface transition-colors">Save as Draft</button>
+<button class="flex items-center gap-2.5 px-10 h-12 rounded-xl bg-primary text-on-primary font-bold text-label-md hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary/20" id="nextBtn">
+            Continue
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Notification -->
+<div class="fixed bottom-10 left-1/2 -translate-x-1/2 translate-y-32 glass-toast text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-5 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-[100] border border-white/10" id="successToast">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined text-xl font-bold">check</span>
+</div>
+<div>
+<p class="font-bold text-lg tracking-tight">Asset Registered Successfully</p>
+<p class="text-sm text-white/70">The asset has been logged in the secure inventory system.</p>
+</div>
+</div>
+<script>
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const form = document.getElementById('registerAssetForm');
+    const toast = document.getElementById('successToast');
+
+    function updateStepperUI() {
+      // Update icons and text
+      for (let i = 1; i <= totalSteps; i++) {
+        const icon = document.getElementById(`step-icon-${i}`);
+        const label = document.querySelector(`.step-item[data-step="${i}"] span`);
+        const line = document.getElementById(`line-${i-1}`);
+
+        if (i < currentStep) {
+          // Completed
+          icon.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span>';
+          icon.className = "w-8 h-8 rounded-full bg-primary-container/40 text-primary flex items-center justify-center mb-3 font-bold transition-all duration-300 text-sm";
+          label.className = "text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/40";
+          if (line) {
+            line.classList.add('step-line-active');
+            line.classList.remove('bg-[#e1e2ed]');
+          }
+        } else if (i === currentStep) {
+          // Active
+          icon.innerHTML = i;
+          icon.className = "w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center mb-3 shadow-lg shadow-primary/20 font-bold transition-all duration-300 text-sm ring-4 ring-primary/10 scale-110";
+          label.className = "text-[11px] font-bold uppercase tracking-wider text-primary";
+          if (line) {
+            line.classList.remove('step-line-active');
+            line.classList.add('bg-[#e1e2ed]');
+          }
+        } else {
+          // Future
+          icon.innerHTML = i;
+          icon.className = "w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-3 transition-all duration-300 text-sm";
+          label.className = "text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/60";
+          if (line) {
+            line.classList.remove('step-line-active');
+            line.classList.add('bg-[#e1e2ed]');
+          }
+        }
+      }
+
+      // Update Visibility
+      document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(`step-content-${currentStep}`).classList.add('active');
+
+      // Update Buttons
+      if (currentStep === 1) {
+        prevBtn.disabled = true;
+        prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        prevBtn.disabled = false;
+        prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+
+      if (currentStep === totalSteps) {
+        nextBtn.innerHTML = 'Complete Registration <span class="material-symbols-outlined text-sm">inventory</span>';
+        nextBtn.classList.replace('bg-primary', 'bg-secondary-container');
+      } else {
+        nextBtn.innerHTML = 'Continue <span class="material-symbols-outlined text-sm">arrow_forward</span>';
+        nextBtn.classList.replace('bg-secondary-container', 'bg-primary');
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateStepperUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Handle Submit
+        toast.classList.remove('translate-y-32');
+        toast.classList.add('translate-y-0');
+        setTimeout(() => {
+          toast.classList.add('translate-y-32');
+          toast.classList.remove('translate-y-0');
+          // Mock redirect
+          console.log("Form Submitted Successfully");
+        }, 4000);
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepperUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    // Handle interactive file drop zones simple feedback
+    document.querySelectorAll('.border-dashed').forEach(zone => {
+      zone.addEventListener('mouseenter', () => zone.classList.add('border-primary/60'));
+      zone.addEventListener('mouseleave', () => zone.classList.remove('border-primary/60'));
+    });
+  </script>
+</body></html>

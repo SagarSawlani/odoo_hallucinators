@@ -1,18 +1,55 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import TopNav from "../components/TopNav";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
+
+interface DashboardSummary {
+  total_assets: number;
+  available: number;
+  allocated: number;
+  undermaintenance: number;
+  lost: number;
+  active_bookings: number;
+  pending_maintenance: number;
+  open_audit_cycles: number;
+  recent_notifications: { id: number; message: string; created_at: string; is_read: number }[];
+}
 
 export default function DashboardPage() {
+  const [data, setData] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    apiFetch("/dashboard/summary")
+      .then((res) => setData(res))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const kpis = data
+    ? [
+        { icon: "inventory_2", label: "Total", value: data.total_assets.toLocaleString(), iconBg: "bg-primary/5", iconColor: "text-primary" },
+        { icon: "verified", label: "Available", value: data.available.toLocaleString(), iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
+        { icon: "person_pin_circle", label: "Allocated", value: data.allocated.toLocaleString(), iconBg: "bg-blue-50", iconColor: "text-blue-600" },
+        { icon: "build", label: "Maintenance", value: data.undermaintenance.toLocaleString(), iconBg: "bg-amber-50", iconColor: "text-amber-600" },
+        { icon: "search_off", label: "Lost", value: data.lost.toLocaleString(), iconBg: "bg-rose-50", iconColor: "text-rose-600" },
+        { icon: "calendar_today", label: "Bookings", value: data.active_bookings.toLocaleString(), iconBg: "bg-indigo-50", iconColor: "text-indigo-600" },
+        { icon: "pending_actions", label: "Pending", value: data.pending_maintenance.toLocaleString(), iconBg: "bg-purple-50", iconColor: "text-purple-600" },
+      ]
+    : [];
+
   return (
     <div className="bg-background text-on-background transition-colors duration-300">
       <Sidebar activePath="/dashboard" />
-      
+
       {/* Main Content Area */}
       <main className="md:pl-[280px] min-h-screen overflow-x-hidden">
         <TopNav />
-        
+
         {/* Dashboard Content */}
         <div className="p-6 lg:p-10 max-w-[1440px] mx-auto space-y-10">
           {/* Page Title & Quick Actions */}
@@ -37,197 +74,180 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* KPI Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 animate-slide-in stagger-1">
-            {[
-              { icon: 'inventory_2', label: 'Total', value: '1,284', iconBg: 'bg-primary/5', iconColor: 'text-primary' },
-              { icon: 'verified', label: 'Ready', value: '432', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-              { icon: 'person_pin_circle', label: 'In Use', value: '715', iconBg: 'bg-blue-50', iconColor: 'text-blue-600' },
-              { icon: 'build', label: 'Repair', value: '84', iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
-              { icon: 'sync_alt', label: 'Transit', value: '12', iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
-              { icon: 'calendar_today', label: 'Booked', value: '38', iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-              { icon: 'keyboard_return', label: 'Returns', value: '06', iconBg: 'bg-rose-50', iconColor: 'text-rose-600' },
-            ].map((kpi) => (
-              <div key={kpi.label} className="bg-white p-5 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
-                <div className={`w-8 h-8 ${kpi.iconBg} ${kpi.iconColor} rounded-lg flex items-center justify-center mb-3`}>
-                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>{kpi.icon}</span>
-                </div>
-                <p className="text-outline text-[11px] font-bold uppercase tracking-wider mb-1 truncate">{kpi.label}</p>
-                <h4 className="text-2xl font-extrabold text-on-surface">{kpi.value}</h4>
+          {/* Loading / Error States */}
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                <p className="text-sm font-semibold text-outline">Loading dashboard data...</p>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
-          {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 animate-slide-in stagger-2">
-            {/* Chart: Asset Utilization */}
-            <div className="lg:col-span-8 bg-white p-6 lg:p-8 rounded-2xl card-soft-shadow border border-outline-variant/10 overflow-hidden">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-3">
-                <div className="min-w-0">
-                  <h3 className="text-lg lg:text-xl font-bold text-on-surface tracking-tight truncate">Asset Utilization</h3>
-                  <p className="text-sm text-outline mt-1 truncate">Real-time aggregate across global departments</p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className="flex items-center gap-1.5 text-[11px] font-bold text-primary">
-                    <span className="w-2 h-2 rounded-full bg-primary"></span> Live Sync
-                  </span>
-                  <select className="bg-surface-container-low/50 border border-outline-variant/20 rounded-lg text-xs font-semibold px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none">
-                    <option>Last 30 Days</option>
-                    <option>Last 6 Months</option>
-                  </select>
-                </div>
-              </div>
-              <div className="h-56 lg:h-72 relative">
-                <div className="absolute inset-0 flex flex-col justify-between">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="w-full h-[1px] bg-outline-variant/10"></div>
-                  ))}
-                </div>
-                <svg className="w-full h-full overflow-visible" viewBox="0 0 800 288" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#004ac6" stopOpacity="0.15"></stop>
-                      <stop offset="100%" stopColor="#004ac6" stopOpacity="0"></stop>
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,220 C100,200 150,210 200,205 C250,200 300,160 400,150 C500,140 600,110 700,95 C750,85 800,90 800,90 L800,288 L0,288 Z" fill="url(#chartGradient)"></path>
-                  <path d="M0,220 C100,200 150,210 200,205 C250,200 300,160 400,150 C500,140 600,110 700,95 C750,85 800,90 800,90" fill="none" stroke="#004ac6" strokeLinecap="round" strokeWidth="3"></path>
-                  <circle cx="400" cy="150" fill="#004ac6" r="5" stroke="#fff" strokeWidth="3"></circle>
-                </svg>
-              </div>
-              <div className="flex justify-between mt-4 px-1">
-                {['SEPT 01', 'SEPT 08', 'SEPT 15', 'SEPT 22', 'SEPT 30'].map((d, i) => (
-                  <span key={d} className={`text-[9px] lg:text-[10px] font-bold ${i === 2 ? 'text-primary' : 'text-outline/50'}`}>{d}</span>
-                ))}
-              </div>
+          {error && (
+            <div className="bg-error/10 border border-error/20 rounded-xl p-4 flex gap-3">
+              <span className="material-symbols-outlined text-error shrink-0">error</span>
+              <p className="text-sm font-medium text-error">{error}</p>
             </div>
-            
-            {/* Donut Chart: Dept Allocation */}
-            <div className="lg:col-span-4 bg-white p-6 lg:p-8 rounded-2xl card-soft-shadow border border-outline-variant/10 flex flex-col overflow-hidden">
-              <h3 className="text-lg lg:text-xl font-bold text-on-surface tracking-tight mb-1 truncate">Department Share</h3>
-              <p className="text-sm text-outline mb-8 truncate">Resource split by operational units</p>
-              <div className="flex-1 flex flex-col items-center justify-center">
-                <div className="relative w-40 h-40 lg:w-56 lg:h-56 mb-8">
-                  <svg className="w-full h-full -rotate-90 drop-shadow-sm" viewBox="0 0 36 36">
-                    <circle cx="18" cy="18" fill="none" r="16" stroke="#f1f5f9" strokeWidth="4"></circle>
-                    <circle cx="18" cy="18" fill="none" r="16" stroke="#004ac6" strokeDasharray="45 100" strokeLinecap="round" strokeWidth="4.5"></circle>
-                    <circle cx="18" cy="18" fill="none" r="16" stroke="#4648d4" strokeDasharray="25 100" strokeDashoffset="-45" strokeLinecap="round" strokeWidth="4.5"></circle>
-                    <circle cx="18" cy="18" fill="none" r="16" stroke="#943700" strokeDasharray="20 100" strokeDashoffset="-70" strokeLinecap="round" strokeWidth="4.5"></circle>
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl lg:text-3xl font-extrabold text-on-surface">1.2k</span>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Assets</span>
-                  </div>
-                </div>
-                <div className="w-full space-y-3">
-                  {[
-                    { label: 'IT & Ops', color: 'bg-primary', pct: '45%' },
-                    { label: 'R&D Team', color: 'bg-secondary', pct: '25%' },
-                    { label: 'Logistics', color: 'bg-tertiary', pct: '20%' },
-                  ].map((item) => (
-                    <div key={item.label} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className={`w-2.5 h-2.5 rounded-full ${item.color} shadow-sm shrink-0`}></span>
-                        <span className="font-medium text-on-surface truncate">{item.label}</span>
-                      </div>
-                      <span className="font-bold shrink-0 ml-2">{item.pct}</span>
+          )}
+
+          {data && (
+            <>
+              {/* KPI Cards Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 animate-slide-in stagger-1">
+                {kpis.map((kpi) => (
+                  <div key={kpi.label} className="bg-white p-5 rounded-2xl card-soft-shadow border border-outline-variant/10 card-hover transition-all">
+                    <div className={`w-8 h-8 ${kpi.iconBg} ${kpi.iconColor} rounded-lg flex items-center justify-center mb-3`}>
+                      <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>{kpi.icon}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Activity + Table Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 animate-slide-in stagger-3">
-            {/* Activity Timeline */}
-            <div className="lg:col-span-5 bg-white p-6 lg:p-8 rounded-2xl card-soft-shadow border border-outline-variant/10 overflow-hidden">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-lg lg:text-xl font-bold text-on-surface tracking-tight truncate">Recent Activity</h3>
-                <button className="text-primary font-bold text-xs hover:underline decoration-2 underline-offset-4 shrink-0 ml-2">History</button>
-              </div>
-              <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-outline-variant/20">
-                {[
-                  { icon: 'check', iconBg: 'bg-emerald-50 text-emerald-600', title: 'Maintenance Complete', desc: 'for Server Rack #82-X', time: 'Today, 09:42 AM • Mark J.', timeIcon: 'schedule' },
-                  { icon: 'swap_horiz', iconBg: 'bg-blue-50 text-blue-600', title: 'Transfer Approved', desc: ': 12x MacBooks to Design', time: 'Yesterday, 04:15 PM • Sarah L.', timeIcon: 'schedule' },
-                  { icon: 'priority_high', iconBg: 'bg-amber-50 text-amber-600', title: 'Critical Issue', desc: ': Cooling Failure in Center B', time: '2 days ago • Automated Alert', timeIcon: 'sensors' },
-                ].map((act, i) => (
-                  <div key={i} className="flex gap-4 relative">
-                    <div className={`w-6 h-6 ${act.iconBg} rounded-full flex items-center justify-center z-10 ring-4 ring-white shrink-0`}>
-                      <span className="material-symbols-outlined text-[14px] font-bold">{act.icon}</span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm text-on-surface leading-relaxed">
-                        <span className="font-bold">{act.title}</span>
-                        <span className="break-words">{act.desc}</span>
-                      </p>
-                      <p className="text-[11px] font-medium text-outline mt-1.5 flex items-center gap-1 flex-wrap">
-                        <span className="material-symbols-outlined text-[12px]">{act.timeIcon}</span>
-                        <span className="truncate">{act.time}</span>
-                      </p>
-                    </div>
+                    <p className="text-outline text-[11px] font-bold uppercase tracking-wider mb-1 truncate">{kpi.label}</p>
+                    <h4 className="text-2xl font-extrabold text-on-surface">{kpi.value}</h4>
                   </div>
                 ))}
               </div>
-            </div>
-            
-            {/* Asset Review Table */}
-            <div className="lg:col-span-7 bg-white rounded-2xl card-soft-shadow border border-outline-variant/10 overflow-hidden flex flex-col">
-              <div className="p-6 lg:p-8 border-b border-outline-variant/10 flex items-center justify-between gap-2">
-                <h3 className="text-lg lg:text-xl font-bold text-on-surface tracking-tight truncate">Critical Assets Review</h3>
-                <div className="flex gap-1 shrink-0">
-                  <button className="p-2 rounded-lg hover:bg-surface-container-high text-outline transition-colors">
-                    <span className="material-symbols-outlined text-[20px]">filter_list</span>
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-surface-container-high text-outline transition-colors">
-                    <span className="material-symbols-outlined text-[20px]">more_horiz</span>
-                  </button>
-                </div>
-              </div>
-              <div className="overflow-x-auto flex-1">
-                <table className="w-full text-left border-collapse min-w-[600px]">
-                  <thead className="bg-surface-container-low/30">
-                    <tr>
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest whitespace-nowrap">Asset ID</th>
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest whitespace-nowrap">Product</th>
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest whitespace-nowrap">Status</th>
-                      <th className="px-6 py-4 text-[10px] font-extrabold text-outline uppercase tracking-widest whitespace-nowrap">Assigned</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-outline-variant/5">
-                    {[
-                      { id: '#AF-77291', name: 'MBP 16" M3', icon: 'laptop_mac', status: 'Healthy', statusColor: 'bg-emerald-50 text-emerald-700 ring-emerald-600/10', assigned: 'James Wilson' },
-                      { id: '#AF-88210', name: 'Nexus 9000', icon: 'router', status: 'In Review', statusColor: 'bg-amber-50 text-amber-700 ring-amber-600/10', assigned: 'Infra Team' },
-                      { id: '#AF-11002', name: 'HP LaserJet', icon: 'print', status: 'Critical', statusColor: 'bg-rose-50 text-rose-700 ring-rose-600/10', assigned: '—' },
-                    ].map((row) => (
-                      <tr key={row.id} className="hover:bg-surface-container-low/40 transition-colors group">
-                        <td className="px-6 py-4 text-sm font-bold text-primary whitespace-nowrap">{row.id}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
-                              <span className="material-symbols-outlined text-sm opacity-60">{row.icon}</span>
-                            </div>
-                            <p className="text-sm font-semibold text-on-surface whitespace-nowrap">{row.name}</p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold ${row.statusColor} ring-1 uppercase whitespace-nowrap`}>{row.status}</span>
-                        </td>
-                        <td className="px-6 py-4 text-sm font-medium text-on-surface-variant whitespace-nowrap">{row.assigned}</td>
-                      </tr>
+
+              {/* Charts Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 animate-slide-in stagger-2">
+                {/* Chart: Asset Utilization */}
+                <div className="lg:col-span-8 bg-white p-6 lg:p-8 rounded-2xl card-soft-shadow border border-outline-variant/10 overflow-hidden">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-3">
+                    <div className="min-w-0">
+                      <h3 className="text-lg lg:text-xl font-bold text-on-surface tracking-tight truncate">Asset Utilization</h3>
+                      <p className="text-sm text-outline mt-1 truncate">Real-time aggregate across global departments</p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="flex items-center gap-1.5 text-[11px] font-bold text-primary">
+                        <span className="w-2 h-2 rounded-full bg-primary"></span> Live Sync
+                      </span>
+                      <select className="bg-surface-container-low/50 border border-outline-variant/20 rounded-lg text-xs font-semibold px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none">
+                        <option>Last 30 Days</option>
+                        <option>Last 6 Months</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="h-56 lg:h-72 relative">
+                    <div className="absolute inset-0 flex flex-col justify-between">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="w-full h-[1px] bg-outline-variant/10"></div>
+                      ))}
+                    </div>
+                    <svg className="w-full h-full overflow-visible" viewBox="0 0 800 288" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="0%" stopColor="#004ac6" stopOpacity="0.15"></stop>
+                          <stop offset="100%" stopColor="#004ac6" stopOpacity="0"></stop>
+                        </linearGradient>
+                      </defs>
+                      <path d="M0,220 C100,200 150,210 200,205 C250,200 300,160 400,150 C500,140 600,110 700,95 C750,85 800,90 800,90 L800,288 L0,288 Z" fill="url(#chartGradient)"></path>
+                      <path d="M0,220 C100,200 150,210 200,205 C250,200 300,160 400,150 C500,140 600,110 700,95 C750,85 800,90 800,90" fill="none" stroke="#004ac6" strokeLinecap="round" strokeWidth="3"></path>
+                      <circle cx="400" cy="150" fill="#004ac6" r="5" stroke="#fff" strokeWidth="3"></circle>
+                    </svg>
+                  </div>
+                  <div className="flex justify-between mt-4 px-1">
+                    {["SEPT 01", "SEPT 08", "SEPT 15", "SEPT 22", "SEPT 30"].map((d, i) => (
+                      <span key={d} className={`text-[9px] lg:text-[10px] font-bold ${i === 2 ? "text-primary" : "text-outline/50"}`}>{d}</span>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="p-5 bg-surface-container-low/20 border-t border-outline-variant/10 flex items-center justify-between">
-                <p className="text-[10px] font-bold text-outline/60 uppercase tracking-widest">Showing 3 of 1.2k</p>
-                <div className="flex gap-3">
-                  <button className="px-4 py-1.5 bg-white border border-outline-variant/20 rounded-lg text-xs font-bold shadow-sm opacity-50 cursor-not-allowed">Back</button>
-                  <button className="px-4 py-1.5 bg-white border border-outline-variant/20 rounded-lg text-xs font-bold shadow-sm hover:bg-surface-container-low transition-colors">Next</button>
+                  </div>
+                </div>
+
+                {/* Donut Chart: Dept Allocation */}
+                <div className="lg:col-span-4 bg-white p-6 lg:p-8 rounded-2xl card-soft-shadow border border-outline-variant/10 flex flex-col overflow-hidden">
+                  <h3 className="text-lg lg:text-xl font-bold text-on-surface tracking-tight mb-1 truncate">Asset Status Split</h3>
+                  <p className="text-sm text-outline mb-8 truncate">Available vs Allocated vs Maintenance</p>
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    <div className="relative w-40 h-40 lg:w-56 lg:h-56 mb-8">
+                      <svg className="w-full h-full -rotate-90 drop-shadow-sm" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" fill="none" r="16" stroke="#f1f5f9" strokeWidth="4"></circle>
+                        {(() => {
+                          const total = data.total_assets || 1;
+                          const avPct = Math.round((data.available / total) * 100);
+                          const alPct = Math.round((data.allocated / total) * 100);
+                          const mtPct = Math.round((data.undermaintenance / total) * 100);
+                          return (
+                            <>
+                              <circle cx="18" cy="18" fill="none" r="16" stroke="#16a34a" strokeDasharray={`${avPct} ${100 - avPct}`} strokeLinecap="round" strokeWidth="4.5"></circle>
+                              <circle cx="18" cy="18" fill="none" r="16" stroke="#004ac6" strokeDasharray={`${alPct} ${100 - alPct}`} strokeDashoffset={`-${avPct}`} strokeLinecap="round" strokeWidth="4.5"></circle>
+                              <circle cx="18" cy="18" fill="none" r="16" stroke="#d97706" strokeDasharray={`${mtPct} ${100 - mtPct}`} strokeDashoffset={`-${avPct + alPct}`} strokeLinecap="round" strokeWidth="4.5"></circle>
+                            </>
+                          );
+                        })()}
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl lg:text-3xl font-extrabold text-on-surface">{data.total_assets.toLocaleString()}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-outline">Assets</span>
+                      </div>
+                    </div>
+                    <div className="w-full space-y-3">
+                      {[
+                        { label: "Available", color: "bg-emerald-500", pct: `${data.total_assets ? Math.round((data.available / data.total_assets) * 100) : 0}%` },
+                        { label: "Allocated", color: "bg-primary", pct: `${data.total_assets ? Math.round((data.allocated / data.total_assets) * 100) : 0}%` },
+                        { label: "Maintenance", color: "bg-amber-500", pct: `${data.total_assets ? Math.round((data.undermaintenance / data.total_assets) * 100) : 0}%` },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className={`w-2.5 h-2.5 rounded-full ${item.color} shadow-sm shrink-0`}></span>
+                            <span className="font-medium text-on-surface truncate">{item.label}</span>
+                          </div>
+                          <span className="font-bold shrink-0 ml-2">{item.pct}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+
+              {/* Recent Notifications + Quick Stats */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 animate-slide-in stagger-3">
+                {/* Recent Notifications */}
+                <div className="lg:col-span-5 bg-white p-6 lg:p-8 rounded-2xl card-soft-shadow border border-outline-variant/10 overflow-hidden">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-lg lg:text-xl font-bold text-on-surface tracking-tight truncate">Recent Notifications</h3>
+                    <Link href="/notifications" className="text-primary font-bold text-xs hover:underline decoration-2 underline-offset-4 shrink-0 ml-2">View All</Link>
+                  </div>
+                  {data.recent_notifications.length === 0 ? (
+                    <p className="text-sm text-outline text-center py-8">No recent notifications</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {data.recent_notifications.map((notif) => (
+                        <div key={notif.id} className="flex gap-3 items-start">
+                          <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${notif.is_read ? "bg-outline-variant" : "bg-primary"}`}></div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-on-surface leading-relaxed truncate">{notif.message}</p>
+                            <p className="text-[11px] font-medium text-outline mt-1">{new Date(notif.created_at).toLocaleString()}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Summary Cards */}
+                <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 flex flex-col items-center justify-center text-center">
+                    <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-3">
+                      <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>build</span>
+                    </div>
+                    <p className="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Pending Maintenance</p>
+                    <h4 className="text-3xl font-extrabold text-on-surface">{data.pending_maintenance}</h4>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 flex flex-col items-center justify-center text-center">
+                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-3">
+                      <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>calendar_today</span>
+                    </div>
+                    <p className="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Active Bookings</p>
+                    <h4 className="text-3xl font-extrabold text-on-surface">{data.active_bookings}</h4>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl card-soft-shadow border border-outline-variant/10 flex flex-col items-center justify-center text-center">
+                    <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-3">
+                      <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>fact_check</span>
+                    </div>
+                    <p className="text-outline text-[11px] font-bold uppercase tracking-wider mb-1">Open Audit Cycles</p>
+                    <h4 className="text-3xl font-extrabold text-on-surface">{data.open_audit_cycles}</h4>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

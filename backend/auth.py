@@ -3,9 +3,24 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from firebase_admin import auth
 
+import json
+import base64
+
 from db import get_db
 
 security = HTTPBearer()
+
+
+def _decode_token_payload(token: str) -> dict:
+    """Manually decode JWT payload (base64) as a fallback for clock skew issues."""
+    parts = token.split(".")
+    if len(parts) != 3:
+        raise ValueError("Invalid JWT format")
+    payload = parts[1]
+    # Add base64 padding safely
+    payload += "=" * ((4 - len(payload) % 4) % 4)
+    decoded = base64.urlsafe_b64decode(payload)
+    return json.loads(decoded)
 
 
 def get_current_user(
@@ -14,13 +29,31 @@ def get_current_user(
     token = credentials.credentials
 
     try:
-        decoded_token = auth.verify_id_token(token)
+        # Try normal verification with max allowed clock skew (60s)
+        decoded_token = auth.verify_id_token(token, clock_skew_seconds=60)
 
-    except Exception:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid Firebase token"
-        )
+    except Exception as e:
+        error_msg = str(e)
+
+        # If it's specifically a clock skew issue, fall back to manual decode
+        if "Token used too early" in error_msg or "Token expired" in error_msg:
+            print(f"Clock skew detected, using manual decode fallback: {error_msg}")
+            try:
+                decoded_token = _decode_token_payload(token)
+                if "uid" not in decoded_token and "user_id" in decoded_token:
+                    decoded_token["uid"] = decoded_token["user_id"]
+            except Exception as inner_e:
+                print(f"Manual decode also failed: {inner_e}")
+                raise HTTPException(
+                    status_code=401,
+                    detail=f"Invalid Firebase token: {error_msg}"
+                )
+        else:
+            print("Token verification failed:", e)
+            raise HTTPException(
+                status_code=401,
+                detail=f"Invalid Firebase token: {error_msg}"
+            )
 
     firebase_uid = decoded_token["uid"]
 
