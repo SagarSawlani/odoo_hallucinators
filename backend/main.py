@@ -15,6 +15,7 @@ from routes.allocation import router as allocation_router
 from routes.transfer import router as transfer_router
 from routes.notifications import router as notifications_router
 from routes.activity_logs import router as activity_logs_router
+from routes.reports import router as reports_router
 
 app = FastAPI(
     title="AssetFlow API",
@@ -46,6 +47,7 @@ app.include_router(audit_router)
 app.include_router(dashboard_router)
 app.include_router(notifications_router)
 app.include_router(activity_logs_router)
+app.include_router(reports_router)
 
 # Person 2
 app.include_router(assets_router)
