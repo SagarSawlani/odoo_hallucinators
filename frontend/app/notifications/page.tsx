@@ -22,6 +22,9 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 function timeAgo(iso: string): string {
+  if (!iso.endsWith("Z") && !iso.includes("+") && !iso.includes("-", 10)) {
+    iso += "Z";
+  }
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";
