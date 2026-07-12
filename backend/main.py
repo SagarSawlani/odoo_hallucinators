@@ -1,15 +1,14 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-
 from firebase import firebase_config
 from crud import create_user, get_all_users, UserAlreadyExists
-
-# Routers
+from routes.booking import router as booking_router
 from routes.department import router as department_router
 from routes.category import router as category_router
 from routes.employee import router as employee_router
-from routes.booking import router as booking_router
+from routes.maintenance import router as maintenance_router
+from routes.audit import router as audit_router
 
 # Person 2 Routers
 from routes.assets import router as assets_router
@@ -33,10 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -----------------------------
-# Exception Handlers
-# -----------------------------
-
 @app.exception_handler(UserAlreadyExists)
 def user_already_exists_handler(request: Request, exc: UserAlreadyExists):
     return JSONResponse(
@@ -52,6 +47,8 @@ app.include_router(department_router)
 app.include_router(category_router)
 app.include_router(employee_router)
 app.include_router(booking_router)
+app.include_router(maintenance_router)
+app.include_router(audit_router)
 
 # Person 2
 app.include_router(assets_router)

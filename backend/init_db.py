@@ -209,6 +209,11 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 )
+""",
+
+"""
+CREATE UNIQUE INDEX IF NOT EXISTS idx_audit_unique_asset_per_cycle
+ON audit_results (audit_cycle_id, asset_id)
 """
 
 ]
